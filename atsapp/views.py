@@ -51,17 +51,17 @@ JOB_KEYWORDS = {
         'api_integration','problem_solving','unit_testing','secure_coding'
     ],
     
-    # 'HR Recruiter' :[  
-    #     'talent acquisition', 'candidate sourcing', 'applicant tracking systems (ATS)',  
-    #     'LinkedIn Recruiter', 'job post optimization', 'employer branding',  
-    #     'interview coordination', 'workforce planning', 'compensation benchmarking',  
-    #     'diversity hiring', 'HR compliance', 'behavioral interviewing',  
-    #     'candidate assessment', 'onboarding strategies', 'employee retention',  
-    #     'Glassdoor management', 'Boolean search', 'HR analytics', 'ATS integrations',  
-    #     'EEOC compliance', 'cold outreach', 'job market analysis', 'salary negotiations',  
-    #     'workday recruitment', 'greenhouse software', 'indeed hiring platform',  
-    #     'candidate pipelining', 'skills gap analysis', 'recruitment marketing'  
-    #     ]
+    'HR Recruiter' :[  
+        'talent acquisition', 'candidate sourcing', 'applicant tracking systems (ATS)',  
+        'LinkedIn Recruiter', 'job post optimization', 'employer branding',  
+        'interview coordination', 'workforce planning', 'compensation benchmarking',  
+        'diversity hiring', 'HR compliance', 'behavioral interviewing',  
+        'candidate assessment', 'onboarding strategies', 'employee retention',  
+        'Glassdoor management', 'Boolean search', 'HR analytics', 'ATS integrations',  
+        'EEOC compliance', 'cold outreach', 'job market analysis', 'salary negotiations',  
+        'workday recruitment', 'greenhouse software', 'indeed hiring platform',  
+        'candidate pipelining', 'skills gap analysis', 'recruitment marketing'  
+        ]
 }
 
 def extract_text_from_docx(file_path):
