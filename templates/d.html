@@ -1,0 +1,143 @@
+class CustomUser(AbstractUser):
+    ROLE_CHOICES = (
+        ("regular", "Regular User"),
+        ("analyst", "Analyst"),
+    )
+    phone = models.CharField(max_length=10, blank=True, null=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="regular")
+
+    def __str__(self):
+        return self.username
+
+
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    role = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES, required=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ["username", "email", "phone", "role", "password1", "password2"]
+
+
+
+def register_view(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            if user.role == "analyst":
+                return redirect("analyst_dashboard") 
+            return redirect("check_phishing")  
+    else:
+        form = RegisterForm()
+    
+    return render(request, "accounts/register.html", {"form": form})
+
+
+def login_view(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                
+                if user.is_superuser:
+                    return redirect("admin_dashboard")
+                elif user.role == "analyst":
+                    return redirect("analyst_dashboard")
+                return redirect("check_phishing")
+            else:
+                messages.error(request, "Invalid username or password")
+        else:
+            messages.error(request, "Invalid username or password")
+    
+    form = AuthenticationForm()
+    return render(request, "accounts/login.html", {"form": form})
+
+def analyst_dashboard(request):
+    return render(request, "analyst/analyst_dashboard.html")
+
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("login")
+
+
+
+
+<form method="post" class="loginForm">
+              {% csrf_token %}
+          
+              <div class="profileImage">
+                  <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+              </div>
+          
+              <div class="form-group">
+                  <i class="fa fa-user form-icon"></i>
+                  <input type="text" class="form-control" name="username" placeholder="Username" required>
+              </div>
+          
+              <div class="form-group">
+                  <i class="fa fa-lock form-icon"></i>
+                  <input type="password" class="form-control" name="password" placeholder="Password" required>
+              </div>
+          
+              <button type="submit" class="btn btn-default">Login</button>
+          </form>
+
+
+
+
+
+<form method="post" class="loginForm">
+            {% csrf_token %}
+        
+            <div class="profileImage">
+                <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+            </div>
+        
+            <div class="form-group">
+                <i class="fa fa-user form-icon"></i>
+                <input type="text" class="form-control" name="username" placeholder="Username" required>
+            </div>
+        
+            <div class="form-group">
+                <i class="fa fa-envelope form-icon"></i>
+                <input type="email" class="form-control" name="email" placeholder="Email" required>
+            </div>
+        
+            <div class="form-group">
+                <i class="fa fa-phone form-icon"></i>
+                <input type="text" class="form-control" name="phone" placeholder="Phone" required>
+            </div>
+        
+             <div class="form-group">
+                <i class="fa fa-user-tag form-icon"></i>
+                <select name="role" class="form-control" required>
+                    <option value="">Select Role</option>
+                    {% for key, value in form.fields.role.choices %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+              </div>
+            
+        
+            <div class="form-group">
+                <i class="fa fa-lock form-icon"></i>
+                <input type="password" class="form-control" name="password1" placeholder="Password" required>
+            </div>
+        
+            <div class="form-group">
+                <i class="fa fa-lock form-icon"></i>
+                <input type="password" class="form-control" name="password2" placeholder="Confirm Password" required>
+            </div>
+        
+            <button type="submit" class="btn btn-default">Register</button>
+          </form>

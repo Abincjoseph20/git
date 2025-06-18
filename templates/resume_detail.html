@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* ===== Resume Detail Styles ===== */
+    .resume-detail-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 2.5rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .resume-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .resume-header h1 {
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .detail-card {
+        background: #f9fafc;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid #4361ee;
+        transition: all 0.3s ease;
+    }
+
+    .detail-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .detail-card h3 {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+
+    .detail-card p {
+        color: #2c3e50;
+        font-size: 1.1rem;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .score-card {
+        background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .score-card h3 {
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 0.5rem;
+    }
+
+    .score-card .score {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+    }
+
+    .keywords-container {
+        margin: 2rem 0;
+    }
+
+    .keywords-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-top: 1rem;
+    }
+
+    .keyword {
+        background: #4cc9f0;
+        color: white;
+        padding: 0.5rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .resume-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #eee;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #ddd;
+    }
+
+    .btn-back:hover {
+        background: #e9ecef;
+    }
+
+    .btn-download {
+        background: #4361ee;
+        color: white;
+    }
+
+    .btn-download:hover {
+        background: #3a0ca3;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .resume-detail-container {
+            padding: 1.5rem;
+        }
+        
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="resume-detail-container">
+    <div class="resume-header">
+        <h1>Resume Details</h1>
+        <div class="score-card">
+            <h3>ATS Score</h3>
+            <div class="score">{{ resume.ats_score }}%</div>
+            <small>Match Percentage</small>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+        <div class="detail-card">
+            <h3>👤 Candidate Name</h3>
+            <p>{{ resume.name }}</p>
+        </div>
+        
+        <div class="detail-card">
+            <h3>📞 Contact Number</h3>
+            <p>{{ resume.phone_number }}</p>
+        </div>
+        
+        <div class="detail-card">
+            <h3>🎓 Highest Qualification</h3>
+            <p>{{ resume.get_qualification_display }}</p>
+        </div>
+
+        <div class="detail-card">
+            <h3>💼 Applied For</h3>
+            <p>{{ resume.job_role|default:"Not specified" }}</p>
+        </div>
+    </div>
+
+    <div class="keywords-container">
+        <h3>🔍 Matched Keywords</h3>
+        <div class="keywords-grid">
+            {% for keyword in resume.get_matched_keywords %}
+                <span class="keyword">{{ keyword }}</span>
+            {% empty %}
+                <p>No keywords matched</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="resume-actions">
+        <a href="{% url 'high_score_resumes' %}" class="btn btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Resumes
+        </a>
+        <a href="{% url 'download_resume' resume.id %}" download class="btn btn-download">
+            <i class="fas fa-download"></i> Download Resume
+        </a>
+    </div>
+
+
+
+    {% if is_pdf %}
+    <div class="resume-viewer">
+        {% comment %} <iframe 
+            src="{{ file_url }}" 
+            style="width:100%; height:600px; border:none;" 
+            aria-label="PDF Viewer">
+        </iframe> {% endcomment %}
+            {% if is_pdf %}
+            <iframe src="{{ file_url }}" width="100%" height="600px" style="border: none;"></iframe>
+        {% else %}
+            <p>This file is not previewable. <a href="{{ file_url }}">Download Resume</a></p>
+        {% endif %}
+    </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> 
+            This file format cannot be previewed. 
+            <a href="{{ file_url }}" download class="btn btn-sm btn-primary">
+                <i class="fas fa-download"></i> Download File
+            </a>
+        </div>
+
+
+        
+    {% endif %} 
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Font Awesome for icons -->
+<script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
+{% endblock %}

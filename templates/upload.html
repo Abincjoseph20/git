@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}ATS - Resume Analyzer{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Base styles */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+    }
+
+    .container {
+        max-width: 100%;
+        padding: 20px;
+    }
+
+    /* Form container */
+    .form-container {
+        max-width: 800px;
+        margin: 20px auto;
+    }
+
+    form {
+        background: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    /* Form elements */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #444;
+    }
+
+    select, input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        margin-bottom: 15px;
+        background-color: #f8f8f8;
+        transition: all 0.3s ease;
+    }
+
+    select:focus, input[type="file"]:focus {
+        border-color: #4a90e2;
+        outline: none;
+        background-color: #fff;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    }
+
+    /* Button styles */
+    button[type="submit"] {
+        background-color: #4a90e2;
+        color: white;
+        border: none;
+        padding: 14px 20px;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        display: block;
+        width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #357ab8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    button[type="submit"]:active {
+        transform: translateY(0);
+    }
+
+    /* Result styles */
+    .result {
+        background: #e8f5e9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #4caf50;
+        transition: all 0.3s ease;
+    }
+
+    .result h3 {
+        color: #2e7d32;
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    /* Matched keywords styles */
+    .matched-keywords {
+        background: #e3f2fd;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #2196f3;
+        transition: all 0.3s ease;
+    }
+
+    .matched-keywords strong {
+        color: #1565c0;
+        display: block;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+    }
+
+    .matched-keywords ul {
+        margin: 10px 0 0 0;
+        padding-left: 20px;
+        columns: 2;
+        column-gap: 20px;
+    }
+
+    .matched-keywords li {
+        margin-bottom: 8px;
+        break-inside: avoid;
+    }
+
+    /* Animation for results */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result, .matched-keywords {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 15px;
+        }
+        
+        form {
+            padding: 20px;
+        }
+
+        .matched-keywords ul {
+            columns: 1;
+        }
+
+        button[type="submit"] {
+            padding: 12px 15px;
+            font-size: 15px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 10px;
+        }
+
+        form {
+            padding: 15px;
+        }
+
+        select, input[type="file"] {
+            padding: 10px;
+            font-size: 15px;
+        }
+
+        .result, .matched-keywords {
+            padding: 15px;
+        }
+
+        .result h3, .matched-keywords strong {
+            font-size: 1rem;
+        }
+    }
+
+    /* Loading state */
+    .loading {
+        position: relative;
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    .loading:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: -12px 0 0 -12px;
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data" id="resume-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                {{ form.as_p }}
+            </div>
+            
+            <div class="form-group">
+                <label for="job_role">Select Job Role:</label>
+                <select name="job_role" required>
+                    <option value="">--Choose a role--</option>
+                    {% for role in roles %}
+                        <option value="{{ role }}" {% if role == selected_role %}selected{% endif %}>{{ role|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+          
+            <button type="submit" id="submit-btn">Upload Resume</button>
+        </form>
+
+        {% if result %}
+            <div class="result">
+                <h3>{{ result }}</h3>
+            </div>
+        {% endif %}
+
+        {% if matched %}
+            <div class="matched-keywords">
+                <strong>Matched Keywords:</strong>
+                <ul>
+                    {% for keyword in matched %}
+                        <li>{{ keyword }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Add loading state to form submission
+    document.getElementById('resume-form').addEventListener('submit', function() {
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.classList.add('loading');
+        submitBtn.innerHTML = 'Processing...';
+    });
+</script>
+{% endblock %}

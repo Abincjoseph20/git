@@ -1,0 +1,23 @@
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'home' %}" class="logo">Job Portal</a>
+        
+        <div class="menu-toggle" id="mobile-menu">
+            ☰
+        </div>
+        
+        <ul class="nav-links" id="nav-links">
+            <li><a href="{% url 'upload_resume' %}">ATS</a></li>
+            <li class="dropdown">
+                <a href="javascript:void(0)">Filter Resumes</a>
+                <div class="dropdown-content">
+                    <a href="{% url 'resume_filter' %}">All Resumes</a>
+                    {% for role in JOB_KEYWORDS.keys %}
+                        <a href="{% url 'resume_filter' %}?job_role={{ role }}">{{ role|title }}</a>
+                    {% endfor %}
+                </div>
+            </li>
+            <li><a href="{% url 'high_score_resumes' %}">Contact</a></li>
+        </ul>
+    </div>
+</nav>

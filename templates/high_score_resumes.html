@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Resume Analyzer{% endblock %}
+
+{% block extra_css %}
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+        
+        h1 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            padding: 8px 12px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .back-btn:hover {
+            background: #2980b9;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            min-width: 600px; /* Minimum width for table */
+        }
+        
+        th {
+            background: #3498db;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+        
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.85rem;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .keyword {
+            display: inline-block;
+            background: #e8f4fc;
+            color: #3498db;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin: 2px;
+            font-size: 0.75rem;
+        }
+        
+        .btn {
+            padding: 5px 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: none;
+            white-space: nowrap;
+        }
+        
+        .btn-details {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .btn-details:hover {
+            background: #27ae60;
+        }
+        
+        .btn-download {
+            background: #3498db;
+            color: white;
+            margin-right: 5px;
+        }
+        
+        .btn-download:hover {
+            background: #2980b9;
+        }
+        
+        .score {
+            font-weight: 500;
+            color: #2ecc71;
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .back-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            
+            th, td {
+                padding: 6px 8px;
+            }
+            
+            .btn {
+                padding: 4px 6px;
+                font-size: 0.75rem;
+            }
+            
+            .keyword {
+                padding: 1px 4px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px;
+            }
+            
+            h1 {
+                font-size: 1.2rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            h1 i {
+                margin-bottom: 5px;
+            }
+            
+            .actions {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1><i class="fas fa-file-alt"></i> High Scoring Resumes (50%+)</h1>
+        <a href="{% url 'upload_resume' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Upload
+        </a>
+        
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Qualification</th>
+                        <th>Job Role</th>
+                        <th>Score</th>
+                        <th>Keywords</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for resume in resumes %}
+                    <tr>
+                        <td>{{ resume.name }}</td>
+                        <td>{{ resume.phone_number }}</td>
+                        <td>{{ resume.qualification }}</td>
+                        <td>{{ resume.job_role }}</td>
+                        <td class="score">{{ resume.ats_score }}%</td>
+                        <td>
+                            {% for keyword in resume.get_matched_keywords %}
+                                <span class="keyword">{{ keyword }}</span>
+                            {% endfor %}
+                        </td>
+                        <td class="actions">
+                            <a href="{{ resume.file.url }}" class="btn btn-download" download>
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                            <a href="{% url 'resume_detail' resume.id %}" class="btn btn-details">
+                                <i class="fas fa-info-circle"></i> Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty-message">
+                            <i class="fas fa-folder-open" style="font-size:24px;"></i><br>
+                            No high scoring resumes found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

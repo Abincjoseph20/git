@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Filter Container */
+    .filter-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-container h2 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    /* Filter Form */
+    .filter-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 1.5rem;
+        align-items: flex-end;
+        margin-bottom: 2.5rem;
+        padding: 1.5rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .form-group select,
+    .form-group input {
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    .form-group select:focus,
+    .form-group input:focus {
+        outline: none;
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    }
+
+    .filter-button {
+        padding: 0.75rem 1.5rem;
+        background-color: #4a90e2;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .filter-button:hover {
+        background-color: #3a7bc8;
+    }
+
+    /* Results Section */
+    .resume-results h3 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        font-weight: 500;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .resume-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+    }
+
+    .resume-table th {
+        background-color: #4a90e2;
+        color: white;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 500;
+    }
+
+    .resume-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        color: #495057;
+    }
+
+    .resume-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .action-links {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-links a {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .view-link {
+        background-color: #4a90e2;
+        color: white;
+    }
+
+    .view-link:hover {
+        background-color: #3a7bc8;
+    }
+
+    .download-link {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .download-link:hover {
+        background-color: #218838;
+    }
+
+    .no-results {
+        padding: 2rem;
+        text-align: center;
+        color: #6c757d;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        font-size: 1.1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .filter-form {
+            grid-template-columns: 1fr;
+        }
+        
+        .resume-table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .resume-table th, 
+        .resume-table td {
+            padding: 0.75rem;
+        }
+        
+        .action-links {
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+    }
+
+    /* Status badges for scores */
+    .score-high {
+        color: #28a745;
+        font-weight: 600;
+    }
+    .score-medium {
+        color: #fd7e14;
+        font-weight: 600;
+    }
+    .score-low {
+        color: #dc3545;
+        font-weight: 600;
+    }
+</style>
+
+<div class="filter-container">
+    <h2>Filter Resumes</h2>
+    
+    <form method="get" class="filter-form">
+        <div class="form-group">
+            <label for="job_role">Job Role:</label>
+            <select name="job_role" id="job_role">
+                <option value="">All Roles</option>
+                {% for role in roles %}
+                    <option value="{{ role }}" {% if role == selected_role %}selected{% endif %}>{{ role|title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="min_score">Minimum ATS Score:</label>
+            <input type="number" name="min_score" id="min_score" min="0" max="100" value="{{ min_score }}" placeholder="0">
+        </div>
+        
+        <button type="submit" class="filter-button">Apply Filters</button>
+    </form>
+    
+    <div class="resume-results">
+        <h3>Filtered Resumes ({{ resumes.count }})</h3>
+        
+        {% if resumes %}
+            <table class="resume-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Job Role</th>
+                        <th>ATS Score</th>
+                        <th>Upload Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for resume in resumes %}
+                    <tr>
+                        <td>{{ resume.file.name|slice:"12:"|truncatechars:30 }}</td>
+                        <td>{{ resume.job_role|title }}</td>
+                        <td class="{% if resume.ats_score >= 75 %}score-high{% elif resume.ats_score >= 50 %}score-medium{% else %}score-low{% endif %}">
+                            {{ resume.ats_score|floatformat:0 }}%
+                        </td>
+                        <td>{{ resume.uploaded_at|date:"Y-m-d" }}</td>
+                        <td>
+                            <div class="action-links">
+                                <a href="{% url 'resume_detail' resume.id %}" class="view-link">View</a>
+                                <a href="{% url 'download_resume' resume.id %}" class="download-link">Download</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-results">No resumes match your filters.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Add active class to current filter options
+    document.addEventListener('DOMContentLoaded', function() {
+        // Highlight selected filters
+        const urlParams = new URLSearchParams(window.location.search);
+        const jobRole = urlParams.get('job_role');
+        const minScore = urlParams.get('min_score');
+        
+        if (jobRole) {
+            document.getElementById('job_role').value = jobRole;
+        }
+        if (minScore) {
+            document.getElementById('min_score').value = minScore;
+        }
+        
+        // Make table rows clickable
+        document.querySelectorAll('.resume-table tbody tr').forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Don't trigger if clicking on action links
+                if (!e.target.closest('.action-links')) {
+                    const viewLink = this.querySelector('.view-link');
+                    if (viewLink) {
+                        window.location.href = viewLink.href;
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

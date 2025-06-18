@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Resume Analyzer{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section */
+    .hero {
+        background: linear-gradient(135deg, #3498db, #2c3e50);
+        color: white;
+        padding: 4rem 2rem;
+        text-align: center;
+        border-radius: 8px;
+        margin-bottom: 3rem;
+    }
+    
+    .hero h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 2rem;
+    }
+    
+    .cta-button {
+        display: inline-block;
+        background-color: #e74c3c;
+        color: white;
+        padding: 0.8rem 1.8rem;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+    
+    .cta-button:hover {
+        background-color: #c0392b;
+    }
+    
+    /* Features Section */
+    .features {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 3rem;
+    }
+    
+    .feature-card {
+        flex: 0 0 calc(33.333% - 2rem);
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        transition: transform 0.3s;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .feature-card h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-icon {
+        font-size: 2.5rem;
+        color: #3498db;
+        margin-bottom: 1rem;
+    }
+    
+    /* How It Works Section */
+    .how-it-works {
+        background-color: #f1f1f1;
+        padding: 3rem 2rem;
+        border-radius: 8px;
+        margin-bottom: 3rem;
+    }
+    
+    .how-it-works h2 {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #2c3e50;
+    }
+    
+    .steps {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    
+    .step {
+        flex: 0 0 calc(33.333% - 2rem);
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .step-number {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        background-color: #3498db;
+        color: white;
+        border-radius: 50%;
+        line-height: 40px;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .feature-card {
+            flex: 0 0 100%;
+        }
+        
+        .step {
+            flex: 0 0 100%;
+            margin-bottom: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Smart Resume Analyzer</h1>
+        <p>Upload your resume and get instant analysis, keyword matching, and personalized feedback to improve your job application success rate.</p>
+        <a href="{% url 'upload_resume' %}" class="cta-button">Analyze Your Resume Now</a>
+    </section>
+
+    <!-- Features Section -->
+    <section>
+        <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">Key Features</h2>
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Keyword Analysis</h3>
+                <p>Identify the most important keywords in your resume and compare them with job descriptions to improve your match rate.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>ATS Compatibility</h3>
+                <p>Check how well your resume performs with Applicant Tracking Systems used by most employers today.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💡</div>
+                <h3>Personalized Tips</h3>
+                <p>Receive actionable suggestions to improve your resume's content, structure, and formatting.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+        <h2>How It Works</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Upload Your Resume</h3>
+                <p>Simply upload your resume in PDF, DOCX, or TXT format.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Instant Analysis</h3>
+                <p>Our system will analyze your resume in seconds.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Get Results</h3>
+                <p>View your detailed report and improvement suggestions.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section style="text-align: center; margin-bottom: 3rem;">
+        <h2 style="margin-bottom: 1rem; color: #2c3e50;">Ready to Improve Your Resume?</h2>
+        <a href="{% url 'upload_resume' %}" class="cta-button">Get Started Now</a>
+    </section>
+{% endblock %}
